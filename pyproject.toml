@@ -6,7 +6,8 @@ authors = [
 ]
 dependencies = [
     "httpx",
-    "tenacity"
+    "tenacity",
+    "pydantic",
 ]
 
 [project.optional-dependencies]
