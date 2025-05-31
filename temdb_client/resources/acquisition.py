@@ -6,6 +6,7 @@ from ..models.acquisition import (
     AcquisitionCreate,
     AcquisitionUpdate,
     AcquisitionResponse,
+    AcquisitionFullMetadata,
     StorageLocationCreate,
     StorageLocation,
     AcquisitionStatus,
@@ -37,7 +38,7 @@ class AcquisitionResource(BaseResource):
         sort_by: str = "start_time",
         sort_order: int = -1,
         specimen_id: Optional[str] = None,
-        roi_id: Optional[int] = None,
+        roi_id: Optional[str] = None,
         acquisition_task_id: Optional[str] = None,
         montage_set_name: Optional[str] = None,
         magnification: Optional[int] = None,
@@ -164,3 +165,54 @@ class AcquisitionResource(BaseResource):
         """Get the calculated URI for the acquisition's minimap."""
         endpoint = f"acquisitions/{acquisition_id}/minimap-uri"
         return await self._get(endpoint)
+
+    async def get_complete_metadata(
+        self, acquisition_id: str
+    ) -> Dict[str, Any]:
+        """Get complete metadata for an acquisition."""
+        endpoint = f"acquisitions/{acquisition_id}/complete-metadata"
+        response_data = await self._get(endpoint)
+        return response_data if isinstance(response_data, dict) else {}
+
+    async def get_with_full_metadata(
+        self, acquisition_id: str
+    ) -> "AcquisitionFullMetadata":
+        """Get acquisition with complete hierarchy metadata including substrate."""
+        endpoint = f"acquisitions/{acquisition_id}/metadata"
+        response_data = await self._get(endpoint)
+        return AcquisitionFullMetadata.model_validate(response_data)
+
+    async def list_with_full_metadata(
+        self,
+        cursor: Optional[str] = None,
+        limit: int = 50,
+        sort_by: str = "start_time",
+        sort_order: int = -1,
+        specimen_id: Optional[str] = None,
+        roi_id: Optional[str] = None,
+        acquisition_task_id: Optional[str] = None,
+        montage_set_name: Optional[str] = None,
+        magnification: Optional[int] = None,
+        status: Optional[AcquisitionStatus] = None,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
+        **kwargs: Any,
+    ) -> Dict[str, Any]:
+        """List acquisitions with complete hierarchy metadata using MongoDB aggregation."""
+        params = {
+            "cursor": cursor,
+            "limit": limit,
+            "sort_by": sort_by,
+            "sort_order": sort_order,
+            "specimen_id": specimen_id,
+            "roi_id": roi_id,
+            "acquisition_task_id": acquisition_task_id,
+            "montage_set_name": montage_set_name,
+            "magnification": magnification,
+            "status": status.value if status else None,
+            "start_date": start_date.isoformat() if start_date else None,
+            "end_date": end_date.isoformat() if end_date else None,
+        }
+        params = {k: v for k, v in params.items() if v is not None}
+        params.update(kwargs)
+        return await self._get("acquisitions/aggregated", params=params)
