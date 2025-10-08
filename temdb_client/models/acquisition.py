@@ -82,7 +82,7 @@ class AcquisitionBase(BaseModel):
     replaces_acquisition_id: Optional[int] = None
     montage_id: Optional[str] = None
     acquisition_id: Optional[str] = None
-    roi_id: Optional[int] = None
+    roi_id: Optional[str] = None
     acquisition_task_id: Optional[str] = None
     specimen_id: Optional[str] = None
 
@@ -93,7 +93,7 @@ class AcquisitionBase(BaseModel):
 class AcquisitionCreate(AcquisitionBase):
     montage_id: str = Field(...)
     acquisition_id: str = Field(...)
-    roi_id: int = Field(...)
+    roi_id: str = Field(...) 
     acquisition_task_id: str = Field(...)
     hardware_settings: HardwareParams = Field(...)
     acquisition_settings: AcquisitionParams = Field(...)
@@ -111,7 +111,7 @@ class AcquisitionResponse(AcquisitionBase):
     acquisition_id: str = Field(...)
     montage_id: str = Field(...)
     specimen_id: str = Field(...)
-    roi_id: int = Field(...)
+    roi_id: str = Field(...)  
     acquisition_task_id: str = Field(...)
     hardware_settings: HardwareParams
     acquisition_settings: AcquisitionParams
@@ -120,3 +120,19 @@ class AcquisitionResponse(AcquisitionBase):
 
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+
+class AcquisitionFullMetadata(BaseModel):
+    """Acquisition with complete hierarchy metadata"""
+
+    acquisition: AcquisitionResponse
+    task: Optional[Dict[str, Any]] = None
+    roi: Optional[Dict[str, Any]] = None
+    section: Optional[Dict[str, Any]] = None
+    cutting_session: Optional[Dict[str, Any]] = None
+    block: Optional[Dict[str, Any]] = None
+    specimen: Optional[Dict[str, Any]] = None
+    substrate: Optional[Dict[str, Any]] = None
+
+    class Config:
+        extra = "allow"

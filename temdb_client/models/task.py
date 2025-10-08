@@ -15,7 +15,7 @@ class AcquisitionTaskBase(BaseModel):
     completed_at: Optional[datetime] = None
     specimen_id: Optional[str] = None
     block_id: Optional[str] = None
-    roi_id: Optional[int] = None
+    roi_id: Optional[str] = None
     task_id: Optional[str] = None
     version: Optional[int] = None
 
@@ -27,7 +27,7 @@ class AcquisitionTaskCreate(AcquisitionTaskBase):
     task_id: str = Field(...)
     specimen_id: str = Field(...)
     block_id: str = Field(...)
-    roi_id: int = Field(...)
+    roi_id: str = Field(...)
     tags: List[str] = Field(default_factory=list)
     metadata: Dict[str, Any] = Field(default_factory=dict)
     task_type: str = "standard_acquisition"
@@ -44,11 +44,10 @@ class AcquisitionTaskResponse(AcquisitionTaskBase):
     task_id: str = Field(...)
     specimen_id: str = Field(...)
     block_id: str = Field(...)
-    roi_id: int
+    roi_id: str 
     task_type: str
     version: int
     status: AcquisitionTaskStatus
     created_at: datetime
 
     updated_at: Optional[datetime] = None
-

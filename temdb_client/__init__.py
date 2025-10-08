@@ -8,4 +8,3 @@ __all__ = [
     "TEMdbClientError",
     "NotFoundError",
 ]
-__version__ = "0.1.0"
